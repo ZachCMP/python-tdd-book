@@ -37,18 +37,23 @@ class NewVisitorTest(unittest.TestCase):
 
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == '1: Eat an entire chair' for row in rows),
-            "New to-do item did not appear in table"
-        )
+        self.assertIn('1: Eat an entire chair', [row.text for row in rows])
 
         # There is still a text box inviting him to add another item.  He enters "Collapse into nothing"
-        self.fail('Finish the test!')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Collapse into nothing')
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         # The page updates again, and now shows both items on her list
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1: Eat an entire chair', [row.text for row in rows])
+        self.assertIn('2: Collapse into nothing', [row.text for row in rows])
 
         # Jon wonders whether the site will remember his list.  Then he sees that the site has 
-        # generated a unique URL for him -- there is some explanatory test to that effect.
+        # generated a unique URL for him -- there is some explanatory text to that effect.
+        self.fail('Finish the test!')
 
         # He visits that URL - his to-do list is still there.
 
