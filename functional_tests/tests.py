@@ -1,5 +1,6 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 import time
 
@@ -21,7 +22,7 @@ class NewVisitorTest(LiveServerTestCase):
                 rows = table.find_elements_by_tag_name('tr')
                 self.assertIn(row_text, [row.text for row in rows])
                 return
-            except (AssertionError, Exception) as e:
+            except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
                     raise e
                 time.sleep(0.5)
@@ -50,14 +51,12 @@ class NewVisitorTest(LiveServerTestCase):
         # When he hits enter, the page updates, and now the page lists:
         # "1: Eat an entire chair" as an item in a to-do list
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
         self.wait_for_row_in_list_table('1: Eat an entire chair')
 
         # There is still a text box inviting him to add another item.  He enters "Collapse into nothing"
         inputbox = self.browser.find_element_by_id('id_new_item')
         inputbox.send_keys('Collapse into nothing')
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         # The page updates again, and now shows both items on her list
         self.wait_for_row_in_list_table('1: Eat an entire chair')
